@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sản phẩm – The Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap pg">
+  <h1>Sản phẩm</h1>
+  <p class="sub">Chọn một gian hàng hoặc xem tất cả.</p>
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
+</main>
+<script type="module">
+import {$,CATS,cart,money,esc,header} from './js/app.js';
+header();
+let cur=new URLSearchParams(location.search).get('c')||'all';
+function draw(){
+  $('#tabs').innerHTML=[['all','Tất cả'],...CATS.map(c=>[c.id,c.icon+' '+c.name])].map(([k,l])=>`<button class="tab" data-k="${k}" aria-pressed="${k===cur}">${esc(l)}</button>`).join('');
+  $('#grid').innerHTML=CATS.filter(c=>cur==='all'||c.id===cur).flatMap(c=>c.products.map(p=>({...p,color:c.color})))
+   .map(p=>`<article class="pc" style="--c:${p.color}"><div class="im" aria-hidden="true">${p.icon}</div><div class="bd"><h3>${esc(p.name)}</h3><p>${esc(p.desc)}</p><div class="pr">${money(p.price)}</div><button class="btn sm" data-id="${p.id}">Thêm vào giỏ</button></div></article>`).join('');
+}
+$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(b){cur=b.dataset.k;draw()}};
+$('#grid').onclick=e=>{const b=e.target.closest('[data-id]');if(!b)return;cart.add(b.dataset.id);b.textContent='Đã thêm ✓';setTimeout(()=>b.textContent='Thêm vào giỏ',1200)};
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thanh toán – The Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap pg">
+  <h1>Thanh toán</h1>
+  <p class="sub">Kiểm tra thông tin giao hàng và chọn cách thanh toán.</p>
+  <div id="msg" class="msg" role="alert" hidden></div>
+  <form id="f" class="co" novalidate>
+    <div class="box">
+      <h2>Thông tin giao hàng</h2>
+      <div class="fld"><label for="name">Họ và tên người nhận</label><input id="name" type="text" autocomplete="name"><small class="err" id="e-name"></small></div>
+      <div class="fld"><label for="phone">Số điện thoại</label><input id="phone" type="tel" autocomplete="tel"><small class="err" id="e-phone"></small></div>
+      <div class="fld"><label for="city">Tỉnh / Thành phố</label><input id="city" type="text" autocomplete="address-level1"><small class="err" id="e-city"></small></div>
+      <div class="fld"><label for="address">Địa chỉ nhận hàng</label><input id="address" type="text" autocomplete="street-address" placeholder="Số nhà, đường, phường/xã, quận/huyện"><small class="err" id="e-address"></small></div>
+      <div class="fld"><label for="note">Ghi chú (không bắt buộc)</label><textarea id="note" rows="2"></textarea></div>
+      <h2>Phương thức thanh toán</h2>
+      <label class="opt"><input type="radio" name="pay" value="cod" checked><span><b>Thanh toán khi nhận hàng (COD)</b><br><small>Trả tiền mặt cho người giao hàng.</small></span></label>
+      <label class="opt"><input type="radio" name="pay" value="bank"><span><b>Chuyển khoản ngân hàng</b><br><small>Sau khi đặt hàng, bạn nhận mã QR để chuyển khoản.</small></span></label>
+    </div>
+    <aside class="box"><h2>Đơn hàng</h2><div id="sum"></div><button class="btn" id="go">Đặt hàng</button></aside>
+  </form>
+</main>
+<script type="module">
+import {$,cart,money,esc,header,need} from './js/app.js';
+import {db,doc,getDoc,setDoc,collection,serverTimestamp} from './js/firebase.js';
+header();
+const L=cart.items();
+if(!L.length){location.replace('gio-hang.html');await new Promise(()=>{})}
+const u=await need();
+const sub=L.reduce((s,x)=>s+x.p.price*x.qty,0),ship=sub>=2000000?0:30000,total=sub+ship;
+$('#sum').innerHTML=L.map(({p,qty})=>`<div class="tt"><span>${esc(p.name)} × ${qty}</span><span>${money(p.price*qty)}</span></div>`).join('')
+ +`<hr><div class="tt"><span>Tạm tính</span><span>${money(sub)}</span></div><div class="tt"><span>Phí vận chuyển</span><span>${ship?money(ship):'Miễn phí'}</span></div>
+ <div class="tt big"><span>Tổng cộng</span><b>${money(total)}</b></div><p class="hint">Miễn phí vận chuyển cho đơn từ 2.000.000đ.</p>`;
+try{const s=await getDoc(doc(db,'users',u.uid));if(s.exists()){$('#name').value=s.data().fullName||'';$('#phone').value=s.data().phone||''}}catch{}
+
+const val=k=>$('#'+k).value, tel=v=>v.replace(/[\s.-]/g,'').replace(/^\+84/,'0');
+const R={
+ name:v=>v.trim().split(/\s+/).filter(Boolean).length>=2?'':'Vui lòng nhập đầy đủ họ và tên.',
+ phone:v=>/^0[35789]\d{8}$/.test(tel(v))?'':'Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0).',
+ city:v=>v.trim().length>=2?'':'Vui lòng nhập tỉnh hoặc thành phố.',
+ address:v=>v.trim().length>=8?'':'Vui lòng nhập địa chỉ đầy đủ (số nhà, đường, phường/xã, quận/huyện).'
+};
+const chk=k=>{const m=R[k](val(k));$('#e-'+k).textContent=m;$('#'+k).setAttribute('aria-invalid',!!m);return !m};
+Object.keys(R).forEach(k=>$('#'+k).addEventListener('blur',()=>val(k)&&chk(k)));
+$('#f').onsubmit=async e=>{
+  e.preventDefault();$('#msg').hidden=true;
+  if(!Object.keys(R).map(chk).every(Boolean)){document.querySelector('[aria-invalid=true]').focus();return}
+  $('#go').disabled=true;$('#go').textContent='Đang đặt hàng…';
+  try{
+    const ref=doc(collection(db,'orders'));
+    await setDoc(ref,{uid:u.uid,code:ref.id.slice(0,8).toUpperCase(),
+      items:L.map(({p,qty})=>({id:p.id,name:p.name,price:p.price,qty})),subtotal:sub,shipping:ship,total,
+      pay:document.querySelector('[name=pay]:checked').value,
+      ship:{name:val('name').trim(),phone:tel(val('phone')),city:val('city').trim(),address:val('address').trim(),note:val('note').trim()},
+      status:'pending',createdAt:serverTimestamp()});
+    cart.clear();location.href='don-hang.html?ok='+ref.id;
+  }catch(err){
+    const m=$('#msg');m.className='msg bad';m.hidden=false;
+    m.textContent=err.code==='permission-denied'?'Chưa có quyền lưu đơn hàng. Hãy kiểm tra Firestore Rules.':'Không đặt được hàng. Vui lòng thử lại.';
+    $('#go').disabled=false;$('#go').textContent='Đặt hàng';
+  }
+};
+</script>
+</body>
+</html>

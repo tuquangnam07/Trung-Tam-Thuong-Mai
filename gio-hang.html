@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giỏ hàng – The Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap pg">
+  <h1>Giỏ hàng</h1>
+  <div id="box"></div>
+</main>
+<script type="module">
+import {$,cart,money,esc,header} from './js/app.js';
+header();
+function draw(){
+  const L=cart.items(),t=L.reduce((s,x)=>s+x.p.price*x.qty,0);
+  if(!L.length){$('#box').innerHTML='<p class="sub">Giỏ hàng đang trống.</p><a class="btn sm" href="san-pham.html">Xem sản phẩm</a>';return}
+  $('#box').innerHTML=L.map(({p,qty})=>`<div class="ln" data-id="${p.id}"><div class="th" style="background:${p.color}22" aria-hidden="true">${p.icon}</div>
+   <div><b>${esc(p.name)}</b><br><small>${money(p.price)}</small></div>
+   <div class="qty"><button data-d="-1" aria-label="Giảm số lượng">−</button><span>${qty}</span><button data-d="1" aria-label="Tăng số lượng">+</button></div>
+   <div class="lt">${money(p.price*qty)}<br><button class="lnk" data-x>Xóa</button></div></div>`).join('')
+   +`<div class="tt big"><span>Tạm tính</span><b>${money(t)}</b></div><p class="sub">Phí vận chuyển được tính ở bước thanh toán.</p><a class="btn sm" href="thanh-toan.html">Tiến hành thanh toán</a>`;
+}
+$('#box').onclick=e=>{
+  const r=e.target.closest('.ln');if(!r)return;
+  const id=r.dataset.id,q=cart.items().find(x=>x.p.id===id).qty;
+  if(e.target.dataset.d)cart.set(id,q+Number(e.target.dataset.d));else if('x' in e.target.dataset)cart.set(id,0);
+  draw();
+};
+draw();
+</script>
+</body>
+</html>

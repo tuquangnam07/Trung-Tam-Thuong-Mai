@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đơn hàng – The Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap pg">
+  <h1>Đơn hàng của tôi</h1>
+  <div id="msg" class="msg ok" role="status" hidden></div>
+  <div id="list"><p class="sub">Đang tải…</p></div>
+</main>
+<script type="module">
+import {$,money,esc,header,need,BANK} from './js/app.js';
+import {db,collection,getDocs,query,where,doc,updateDoc} from './js/firebase.js';
+header();
+const u=await need();
+const ST={pending:['Chờ xác nhận','#8a6a2a'],confirmed:['Đã xác nhận','#3a86c8'],shipping:['Đang giao','#7a4fb5'],done:['Hoàn thành','#2f6b3a'],cancelled:['Đã hủy','#a3261c']};
+const PAY={cod:'Thanh toán khi nhận hàng',bank:'Chuyển khoản ngân hàng'};
+const ok=new URLSearchParams(location.search).get('ok');
+let L=[];
+async function load(){
+  try{
+    const qs=await getDocs(query(collection(db,'orders'),where('uid','==',u.uid)));
+    L=qs.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    draw();
+  }catch(e){$('#list').innerHTML='<p class="msg bad">Không tải được đơn hàng. Hãy kiểm tra Firestore Rules.</p>'}
+}
+function draw(){
+  if(ok){const o=L.find(x=>x.id===ok);if(o){$('#msg').hidden=false;$('#msg').textContent='Đặt hàng thành công. Mã đơn của bạn là '+o.code+'.'}}
+  if(!L.length){$('#list').innerHTML='<p class="sub">Bạn chưa có đơn hàng nào.</p><a class="btn sm" href="san-pham.html">Xem sản phẩm</a>';return}
+  $('#list').innerHTML=L.map(o=>{
+    const [lb,c]=ST[o.status]||[o.status,'#6b6250'],d=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleString('vi-VN'):'';
+    const qr=o.pay==='bank'&&o.status==='pending'?`<div class="qr"><img alt="Mã QR chuyển khoản" src="https://img.vietqr.io/image/${BANK.bin}-${BANK.acc}-compact2.png?amount=${o.total}&addInfo=${encodeURIComponent('VAULT '+o.code)}&accountName=${encodeURIComponent(BANK.name)}"><div>Quét mã để chuyển khoản.<br>Nội dung chuyển khoản: <b>VAULT ${esc(o.code)}</b></div></div>`:'';
+    return `<article class="od" data-id="${o.id}"><div class="oh"><b>Mã đơn ${esc(o.code)}</b><span class="stt" style="--c:${c}">${lb}</span></div>
+     <small>${d}<br>${PAY[o.pay]||''}</small>
+     <ul>${o.items.map(i=>`<li>${esc(i.name)} × ${i.qty}: ${money(i.price*i.qty)}</li>`).join('')}</ul>
+     <div class="tt big"><span>Tổng cộng</span><b>${money(o.total)}</b></div>
+     <small>Giao tới: ${esc(o.ship.name)}, ${esc(o.ship.phone)}, ${esc(o.ship.address)}, ${esc(o.ship.city)}</small>${qr}
+     ${o.status==='pending'?'<p><button class="lnk" data-c>Hủy đơn</button></p>':''}</article>`}).join('');
+}
+$('#list').onclick=async e=>{
+  const b=e.target.closest('[data-c]');if(!b||!confirm('Bạn chắc chắn muốn hủy đơn hàng này?'))return;
+  try{await updateDoc(doc(db,'orders',b.closest('.od').dataset.id),{status:'cancelled'});await load()}
+  catch{alert('Không hủy được đơn. Đơn có thể đã được xác nhận.')}
+};
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Vault – Trung tâm thương mại trực tuyến</title>
+<meta name="description" content="The Vault là trung tâm thương mại trực tuyến với bốn gian hàng. Chọn gian, thêm sản phẩm vào giỏ và đặt hàng chỉ trong vài bước.">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#f7f2e4;--parch:#e3dcc6;--ink:#2d281d;--mute:#6b6250;--gold:#b8964a;--gold-d:#8a6a2a;--line:#cbbf9f}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 50% 0,#f9f5e8,var(--parch) 75%) fixed;color:var(--ink);font:400 1rem/1.65 Inter,system-ui,sans-serif}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold-d);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+h1,h2,.num{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600}
+
+/* Đầu trang */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0}
+.brand{font:600 1.15rem Cinzel,serif;letter-spacing:.2em;color:var(--gold-d);text-decoration:none}
+.links{display:flex;align-items:center;gap:24px;font-size:.9rem}
+.links a{text-decoration:none;color:var(--mute)}
+.links a:hover{color:var(--ink)}
+.btn{display:inline-block;padding:12px 26px;border-radius:999px;background:var(--gold-d);border:1px solid var(--gold-d);color:#fff;font-weight:600;font-size:.95rem;text-decoration:none;transition:background .2s}
+.btn:hover{background:#6f5420}
+.btn.alt{background:transparent;color:var(--gold-d)}
+.btn.alt:hover{background:#8a6a2a1a}
+.links .btn{padding:8px 18px;color:#fff;font-size:.85rem}
+@media(max-width:640px){.links a:not(.btn){display:none}}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:32px;align-items:center;padding:40px 0 80px}
+.hero h1{margin:0 0 18px;font-size:clamp(2.5rem,5.6vw,4.2rem);line-height:1.06;letter-spacing:-.01em}
+.hero p{margin:0 0 28px;max-width:46ch;font-size:1.08rem;color:var(--mute)}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+@media(max-width:860px){.hero{grid-template-columns:1fr;padding-bottom:56px}}
+
+/* Dãy tủ kính 3D (CSS thuần, cùng ngôn ngữ với cửa hàng) */
+.stage{perspective:1000px;display:grid;place-items:center;min-height:340px;background:radial-gradient(ellipse 52% 13% at 50% 84%,#5a46282e,transparent)}
+.row{display:flex;gap:38px;transform-style:preserve-3d;transform:rotateX(-10deg) rotateY(-20deg) scale(var(--s,1))}
+@media(max-width:860px){.row{--s:.85}}
+@media(max-width:520px){.row{--s:.52}.stage{min-height:260px}}
+.bo{position:relative;width:130px;height:170px;transform-style:preserve-3d}
+.bo i{position:absolute;border:2px solid color-mix(in srgb,var(--c) 55%,#fff);background:linear-gradient(135deg,#ffffff5c,#bee0ec26)}
+.bo .a,.bo .z{inset:0}
+.bo .a{transform:translateZ(60px)}
+.bo .z{transform:translateZ(-60px);background:#ebe5d2}
+.bo .l,.bo .r{left:5px;top:0;width:120px;height:170px}
+.bo .l{transform:rotateY(-90deg) translateZ(65px)}
+.bo .r{transform:rotateY(90deg) translateZ(65px)}
+.bo .t{left:0;top:25px;width:130px;height:120px;transform:rotateX(90deg) translateZ(85px)}
+.pv{position:absolute;inset:34px 0 auto;text-align:center;font-size:58px;line-height:1;transform:translateZ(0)}
+.pv span{display:block;animation:fl 5s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes fl{50%{transform:translateY(-12px)}}
+.nm{position:absolute;left:0;top:170px;width:130px;padding:6px 4px;text-align:center;transform:translateZ(60px);
+ background:linear-gradient(#f0ebdb,#d9d1ba);border:1px solid #c0b595;border-top:4px solid var(--c);font-size:.7rem;font-weight:600;line-height:1.25;color:#3a3326}
+
+/* Các phần nội dung */
+section{padding:56px 0}
+h2{margin:0 0 10px;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.12}
+.lead{margin:0 0 32px;max-width:56ch;color:var(--mute)}
+
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.cat{background:var(--ivory);border:1px solid var(--line);border-top:5px solid var(--c);padding:20px 20px 22px}
+.cat .ic{font-size:2rem;line-height:1}
+.cat h3{margin:10px 0 2px;font:600 1.45rem/1.2 "Cormorant Garamond",Georgia,serif}
+.cat small{color:var(--mute)}
+.cat ul{margin:12px 0 0;padding:0;list-style:none;font-size:.92rem}
+.cat li{padding:5px 0;border-top:1px solid #e4dbc0}
+
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:28px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding-left:18px;border-left:2px solid var(--gold)}
+.steps li::before{content:counter(s);display:block;font:600 2.6rem/1 "Cormorant Garamond",Georgia,serif;color:var(--gold-d)}
+.steps b{display:block;margin:6px 0 4px}
+.steps span{color:var(--mute);font-size:.95rem}
+.keys{margin:32px 0 0;font-size:.9rem;color:var(--mute)}
+kbd{padding:1px 7px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:var(--ivory);font:600 .8rem Inter,sans-serif;color:var(--ink)}
+
+.band{background:var(--ink);color:#f4efdf;padding:56px 0}
+.band .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+.band h2{margin:0 0 6px}
+.band p{margin:0;color:#d8cfb4}
+.band .btn{background:#d9b865;border-color:#d9b865;color:var(--ink)}
+.band .btn:hover{background:#ecd08a}
+
+footer{padding:22px 0;font-size:.82rem;color:var(--mute)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 24px}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pv span{animation:none}.btn{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">THE VAULT</a>
+    <nav class="links" aria-label="Điều hướng chính">
+      <a href="#gian-hang">Gian hàng</a>
+      <a href="#cach-xem">Cách xem hàng</a>
+      <a href="#lien-he">Liên hệ</a>
+      <a href="dang-nhap.html">Đăng nhập</a>
+      <a class="btn" href="san-pham.html">Vào cửa hàng</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>Bước vào từng gian hàng, ngay trên trình duyệt.</h1>
+        <p>The Vault là trung tâm thương mại trực tuyến với bốn gian hàng. Chọn gian, thêm sản phẩm vào giỏ và đặt hàng chỉ trong vài bước.</p>
+        <div class="cta">
+          <a class="btn" href="san-pham.html">Vào cửa hàng</a>
+          <a class="btn alt" href="#gian-hang">Xem các gian hàng</a>
+        </div>
+      </div>
+
+      <div class="stage" aria-hidden="true">
+        <div class="row">
+          <div class="bo" style="--c:#c9a24b"><i class="a"></i><i class="z"></i><i class="l"></i><i class="r"></i><i class="t"></i><div class="pv"><span>⌚</span></div><div class="nm">Đồng hồ &amp; Trang sức</div></div>
+          <div class="bo" style="--c:#b5486a"><i class="a"></i><i class="z"></i><i class="l"></i><i class="r"></i><i class="t"></i><div class="pv"><span style="--d:-1.2s">👜</span></div><div class="nm">Thời trang</div></div>
+          <div class="bo" style="--c:#3a86c8"><i class="a"></i><i class="z"></i><i class="l"></i><i class="r"></i><i class="t"></i><div class="pv"><span style="--d:-2.4s">🎧</span></div><div class="nm">Công nghệ</div></div>
+          <div class="bo" style="--c:#7a4fb5"><i class="a"></i><i class="z"></i><i class="l"></i><i class="r"></i><i class="t"></i><div class="pv"><span style="--d:-3.6s">🧴</span></div><div class="nm">Nước hoa &amp; Làm đẹp</div></div>
+        </div>
+      </div>
+    </div>
+
+    <section id="gian-hang">
+      <h2>Bốn gian hàng, một sảnh chung</h2>
+      <p class="lead">Mỗi gian có màu riêng và bộ sản phẩm riêng. Bạn có thể ghé từng gian hoặc xem tất cả cùng lúc.</p>
+      <div class="cats">
+        <article class="cat" style="--c:#c9a24b"><div class="ic">⌚</div><h3>Đồng hồ &amp; Trang sức</h3><small>3 sản phẩm</small>
+          <ul><li>Chrono X1</li><li>Nhẫn Kim Cương</li><li>Vòng Ngọc</li></ul></article>
+        <article class="cat" style="--c:#b5486a"><div class="ic">👜</div><h3>Thời trang</h3><small>4 sản phẩm</small>
+          <ul><li>Aero Steppers</li><li>Lumière Tote</li><li>Áo Khoác Da</li><li>Mũ Dạ</li></ul></article>
+        <article class="cat" style="--c:#3a86c8"><div class="ic">🎧</div><h3>Công nghệ</h3><small>4 sản phẩm</small>
+          <ul><li>Sonic Pro</li><li>Phone X</li><li>Laptop Air</li><li>Camera Pro</li></ul></article>
+        <article class="cat" style="--c:#7a4fb5"><div class="ic">🧴</div><h3>Nước hoa &amp; Làm đẹp</h3><small>3 sản phẩm</small>
+          <ul><li>Essence No.5</li><li>Son Lụa</li><li>Gương Pha Lê</li></ul></article>
+      </div>
+    </section>
+
+    <section id="cach-xem">
+      <h2>Cách xem hàng</h2>
+      <p class="lead">Đăng ký một lần, sau đó mua hàng chỉ mất vài phút.</p>
+      <ol class="steps">
+        <li><b>Chọn gian hàng</b><span>Lọc sản phẩm theo gian: đồng hồ, thời trang, công nghệ hoặc làm đẹp.</span></li>
+        <li><b>Thêm vào giỏ</b><span>Chỉnh số lượng ngay trong giỏ hàng và kiểm tra lại trước khi mua.</span></li>
+        <li><b>Đặt hàng và theo dõi</b><span>Thanh toán khi nhận hàng hoặc chuyển khoản bằng mã QR, rồi xem trạng thái ở mục Đơn hàng.</span></li>
+      </ol>
+    </section>
+  </main>
+</div>
+
+<div class="band" id="lien-he">
+  <div class="wrap">
+    <div>
+      <h2>Sảnh đang mở cửa</h2>
+      <p>Hotline 1900 0000. Mở cửa 9:00 – 22:00 mỗi ngày.</p>
+    </div>
+    <a class="btn" href="san-pham.html">Vào cửa hàng</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 The Vault Mall</span>
+    <span>Mua sắm trực quan 3D</span>
+  </div>
+</footer>
+
+</body>
+</html>

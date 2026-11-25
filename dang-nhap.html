@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập – The Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="auth" style="max-width:460px">
+  <a class="brand" href="index.html">THE VAULT</a>
+  <div class="card">
+    <h1>Đăng nhập</h1>
+    <p class="sub">Chào mừng bạn quay lại cửa hàng.</p>
+    <div id="msg" class="msg" role="alert" hidden></div>
+    <form id="f" novalidate>
+      <div class="fld"><label for="email">Email</label><input id="email" type="email" autocomplete="email"></div>
+      <div class="fld"><label for="password">Mật khẩu</label><input id="password" type="password" autocomplete="current-password"></div>
+      <div class="row"><label class="chk"><input type="checkbox" id="show"> Hiện mật khẩu</label><button class="lnk" id="forgot" type="button">Quên mật khẩu?</button></div>
+      <button class="btn" id="go">Đăng nhập</button>
+    </form>
+    <div class="or">hoặc</div>
+    <button class="gbtn" id="g" type="button"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-2.9-.8-4.7s.3-3.3.8-4.7l-7.9-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg> Tiếp tục với Google</button>
+    <p class="foot">Chưa có tài khoản? <a href="dang-ky.html">Đăng ký</a></p>
+  </div>
+</main>
+<script type="module">
+import {auth,onAuthStateChanged,signInWithEmailAndPassword,sendPasswordResetEmail,googleSignIn,hasProfile,viError,nextUrl} from './js/firebase.js';
+const $=s=>document.querySelector(s);
+const msg=(t,c='bad')=>{const m=$('#msg');m.hidden=!t;m.textContent=t||'';m.className='msg '+c};
+const busy=b=>{$('#go').disabled=$('#g').disabled=b;$('#go').textContent=b?'Đang đăng nhập…':'Đăng nhập'};
+const after=async u=>{location.href=(await hasProfile(u.uid))?nextUrl():'dang-ky.html'+location.search};
+$('#show').onchange=e=>$('#password').type=e.target.checked?'text':'password';
+
+$('#f').onsubmit=async e=>{
+  e.preventDefault();msg();
+  const em=$('#email').value.trim(),pw=$('#password').value;
+  if(!em||!pw){msg('Vui lòng nhập email và mật khẩu.');return}
+  busy(true);
+  try{const {user}=await signInWithEmailAndPassword(auth,em,pw);await after(user)}
+  catch(err){msg(viError(err));busy(false)}
+};
+$('#g').onclick=async()=>{
+  msg();busy(true);
+  try{const {user}=await googleSignIn();await after(user)}
+  catch(err){msg(viError(err));busy(false)}
+};
+$('#forgot').onclick=async()=>{
+  const em=$('#email').value.trim();
+  if(!em){msg('Nhập email của bạn vào ô Email trước, rồi nhấn “Quên mật khẩu?”.');$('#email').focus();return}
+  try{await sendPasswordResetEmail(auth,em);msg('Nếu email này đã đăng ký, bạn sẽ nhận được liên kết đặt lại mật khẩu trong vài phút.','ok')}
+  catch(err){msg(viError(err))}
+};
+const u0=await new Promise(r=>{const off=onAuthStateChanged(auth,u=>{off();r(u)})});
+if(u0){try{await after(u0)}catch{}}
+</script>
+</body>
+</html>
