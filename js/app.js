@@ -13,7 +13,7 @@ export const CATS=[
  S('c1','Đồng hồ & Trang sức','⌚','#c9a24b',[['Chrono X1',24500000,'⌚','Đồng hồ cơ vỏ vàng, dây da thủ công'],['Nhẫn Kim Cương',38000000,'💍','Kim cương tự nhiên 1 carat'],['Vòng Ngọc',9800000,'📿','Ngọc bích chế tác thủ công']]),
  S('c2','Thời trang','👜','#b5486a',[['Aero Steppers',1200000,'👟','Giày thể thao phiên bản giới hạn'],['Lumière Tote',4600000,'👜','Túi da bê cao cấp'],['Áo Khoác Da',6900000,'🧥','Da thật, lót lụa'],['Mũ Dạ',890000,'🎩','Dáng cổ điển']]),
  S('c3','Công nghệ','🎧','#3a86c8',[['Sonic Pro',8500000,'🎧','Tai nghe chống ồn chủ động'],['Phone X',21900000,'📱','Màn hình OLED 120Hz'],['Laptop Air',32000000,'💻','Mỏng nhẹ, pin 20 giờ'],['Camera Pro',15500000,'📷','Cảm biến full-frame']]),
- S('c4','Nước hoa & Làm đẹp','🧴','#7a4fb5',[['Essence No.5',3200000,'🧴','Hương hoa cỏ tinh tế'],['Son Lụa',650000,'💄','Lì mịn, lâu trôi'],['Gương Pha Lê',1800000,'🪞','Viền pha lê chạm khắc']])
+ S('c4','Nước hoa & Làm đẹp','🧴','#7a4fb5',[['Essence No.5',3200000,'🧴','Hương hoa cỏ tinh tế'],['Son Lụa',650000,'💄','Lì mịn, lâu trôi'],['Gương Pha Lê',1800000,'🪞','Viền pha lê chạm khắc'],['Bim Bim',10000,'🪞','Vcl']])
 ];
 export const find=id=>{for(const c of CATS){const p=c.products.find(x=>x.id===id);if(p)return {...p,color:c.color,cat:c.name}}};
 
