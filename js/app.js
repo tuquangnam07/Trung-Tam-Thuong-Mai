@@ -5,7 +5,7 @@ export const money=n=>Number(n||0).toLocaleString('vi-VN')+'đ';
 export const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // Thông tin nhận chuyển khoản (mã QR VietQR). Thay bằng tài khoản thật của bạn.
-export const BANK={bin:'970436',acc:'0123456789',name:'CONG TY THE VAULT'};
+export const BANK={bin:'970422',acc:'0888385536',name:'TU QUANG NAM'};
 
 // Danh mục sản phẩm (id cố định để giỏ hàng và đơn hàng luôn khớp)
 const S=(id,name,icon,color,L)=>({id,name,icon,color,products:L.map(([n,p,i,d],k)=>({id:id+'-'+(k+1),name:n,price:p,icon:i,desc:d}))});
